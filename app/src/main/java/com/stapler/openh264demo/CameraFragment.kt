@@ -76,7 +76,7 @@ class CameraFragment : Fragment() {
             val outputFile =
                 File(requireContext().getExternalFilesDir(Environment.DIRECTORY_MOVIES),
                     "test.h264")
-            pEncoder = h264Encoder.createEncoder(480, 960, outputFile.absolutePath)
+            pEncoder = h264Encoder.createEncoder(TARGET_W, TARGET_H, outputFile.absolutePath)
         }
     }
 
@@ -134,13 +134,13 @@ class CameraFragment : Fragment() {
 
         preview = Preview.Builder()
 //            .setTargetAspectRatio(screenAspectRatio)
-            .setTargetResolution(Size(480, 960))
+            .setTargetResolution(Size(TARGET_W, TARGET_H))
             .setTargetRotation(rotation)
             .build()
 
         imageAnalysis = ImageAnalysis.Builder()
 //            .setTargetAspectRatio(screenAspectRatio)
-            .setTargetResolution(Size(480, 960))
+            .setTargetResolution(Size(TARGET_W, TARGET_H))
             .setTargetRotation(rotation)
             .build()
             .also {
@@ -224,6 +224,15 @@ class CameraFragment : Fragment() {
         displayManager.unregisterDisplayListener(displayListener)
     }
 
+//    private fun getDataFromImage2(image: Image): ByteArray?{
+//        val crop = image.cropRect
+//        val format = image.format
+//        val width = crop.width()
+//        val height = crop.height()
+//        val planes = image.planes
+//        var data: ByteArray? = ByteArray(width * height * ImageFormat.getBitsPerPixel(format) / 8)
+//    }
+
     private fun getDataFromImage(image: Image): ByteArray? {
         val crop = image.cropRect
         val format = image.format
@@ -244,14 +253,15 @@ class CameraFragment : Fragment() {
         val rowData = ByteArray(planes[0].rowStride)
         for (i in planes.indices) {
             val shift = if (i == 0) 0 else 1
-            var plane: Plane? = null
-            if (i == 0) {
-                plane = planes[0]
-            } else if (i == 1) {
-                plane = planes[2]
-            } else if (i == 2) {
-                plane = planes[1]
-            }
+            var plane: Plane? = planes[i]
+
+//            if (i == 0) {
+//                plane = planes[0]
+//            } else if (i == 1) {
+//                plane = planes[2]
+//            } else if (i == 2) {
+//                plane = planes[1]
+//            }
             buffer = plane!!.buffer
             rowStride = plane.rowStride
             pixelStride = plane.pixelStride
@@ -308,6 +318,7 @@ class CameraFragment : Fragment() {
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
-
+        private const val TARGET_W = 480
+        private const val TARGET_H = 960
     }
 }

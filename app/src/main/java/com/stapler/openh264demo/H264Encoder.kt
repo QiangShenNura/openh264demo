@@ -10,7 +10,6 @@ class H264Encoder {
     }
 
     external fun createEncoder(width: Int, height: Int, outputPath: String): Long
-    external fun destroyEncoder()
     external fun encode(pEncoder: Long, data: ByteArray?, width: Int, height: Int): Long
 
 }

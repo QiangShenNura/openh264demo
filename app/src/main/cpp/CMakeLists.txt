@@ -14,6 +14,10 @@ project("openh264demo")
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+#SET( CMAKE_EXE_LINKER FLAGS "-Wl,--build-id ${CMAKE_EXE_LINKER_FLAGS}")
+
 set(CMAKE_CXX_FLAGS  "$ENV{CXXFLAGS}  -fms-extensions")
 # 支持gnu11
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
@@ -22,12 +26,13 @@ set(openh264_lib_DIR ${CMAKE_SOURCE_DIR}/../jniLibs/${ANDROID_ABI})
 set(openh264_head_dir ${CMAKE_SOURCE_DIR}/openh264)
 include_directories(${openh264_head_dir}/include)
 
+
 add_library(libopenh264 SHARED IMPORTED)
 set_target_properties(libopenh264 PROPERTIES IMPORTED_LOCATION
         ${openh264_lib_DIR}/libopenh264.so)
 
-#add_subdirectory(${CMAKE_SOURCE_DIR}/android_aac_enc)
-#add_subdirectory(${CMAKE_SOURCE_DIR}/libyuv)
+#添加子目录，将自动找到子目录中的CMakeLists.txt
+ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/libyuv)
 
 add_library( # Sets the name of the library.
              native-lib
@@ -37,7 +42,7 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
              native-lib.cpp
-             VideoDecoder.cpp
+             VideoEncoder.cpp
              utils/logger.h
              utils/timer.c
              #exports.cpp
@@ -59,11 +64,11 @@ find_library( # Sets the name of the path variable.
               # you want CMake to locate.
               log )
 
-#target_include_directories(native-lib PRIVATE
-#        ${openh264_DIR}/include
-#        libyuv/include
-#        #android_aac_enc
-#        )
+target_include_directories(native-lib PRIVATE
+        ${openh264_DIR}/include
+        libyuv/include
+        #android_aac_enc
+        )
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
@@ -73,7 +78,7 @@ target_link_libraries( # Specifies the target library.
                        native-lib
                         libopenh264
                         #aac_enc
-                        #libyuv
+                        libyuv
                        # Links the target library to the log library
                        # included in the NDK.
                         #使用安卓的头文件,如ANativeWindow
